@@ -3,73 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Affirmation Recognition</title>
+    <title>Affirmation Speech Recognition</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
+            background-color: #f9f9f9;
+            margin: 0;
             padding: 20px;
+            text-align: center;
         }
         h1 {
             color: #333;
         }
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
+        #affirmation {
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #555;
         }
         #start-btn {
             padding: 10px 20px;
             font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #start-btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <h1>Affirmation Recognition</h1>
-    <p>Click the button and say one of the affirmations below:</p>
-    <ul>
-        {% for affirmation in affirmations %}
-            <li>{{ affirmation }}</li>
-        {% endfor %}
-    </ul>
-    
-    <button id="start-btn">Start Listening</button>
-    <div id="result"></div>
+    <h1>Affirmation Speech Recognition</h1>
+    <div id="affirmation">Please click "Start" to begin!</div>
+    <button id="start-btn">Start</button>
+    <input type="file" id="audio-input" accept="audio/*" style="display:none;" />
 
     <script>
+        let currentAffirmation = 0;
         const affirmations = {{ affirmations | tojson }};
-        const resultDiv = document.getElementById('result');
-        const startButton = document.getElementById('start-btn');
 
-        // Web Speech API - SpeechRecognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-
-        startButton.addEventListener('click', () => {
-            resultDiv.textContent = "Listening...";
-            recognition.start();
+        document.getElementById('start-btn').addEventListener('click', () => {
+            if (currentAffirmation < affirmations.length) {
+                document.getElementById('affirmation').innerText = affirmations[currentAffirmation];
+                document.getElementById('audio-input').click();  // Trigger file input
+            }
         });
 
-        recognition.onresult = function(event) {
-            const spokenText = event.results[0][0].transcript.toLowerCase();
-            console.log("User said: ", spokenText);
+        document.getElementById('audio-input').addEventListener('change', (event) => {
+            const audioFile = event.target.files[0];
+            const formData = new FormData();
+            formData.append('audio', audioFile);
 
-            // Check if the spoken text matches any affirmation
-            let matchedAffirmation = affirmations.find(affirmation => affirmation.toLowerCase() === spokenText);
-
-            if (matchedAffirmation) {
-                resultDiv.textContent = "Correct! You said: '" + matchedAffirmation + "'";
-            } else {
-                resultDiv.textContent = "Sorry, that doesn't match any affirmation. You said: '" + spokenText + "'";
-            }
-        };
-
-        recognition.onerror = function(event) {
-            resultDiv.textContent = "Error occurred in recognition: " + event.error;
-        };
+            fetch('/recognize', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    if (data.recognized_text.toLowerCase() === affirmations[currentAffirmation].toLowerCase()) {
+                        alert("Affirmation detected: '" + affirmations[currentAffirmation] + "'");
+                        currentAffirmation++;
+                        document.getElementById('affirmation').innerText = "Please click 'Start' to continue!";
+                    } else {
+                        alert("That's not the affirmation we're looking for. Please try again.");
+                    }
+                }
+            })
+            .catch(err => console.error(err));
+        });
     </script>
 </body>
 </html>

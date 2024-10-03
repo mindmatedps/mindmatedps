@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affirmation Speech Recognition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        #affirmation {
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #555;
+        }
+        #start-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #start-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Affirmation Speech Recognition</h1>
+    <div id="affirmation">Please click "Start" to begin!</div>
+    <button id="start-btn">Start</button>
+
+    <script>
+        const affirmations = [
+            "I am confident",
+            "I am worthy",
+            "I am loved",
+            "I am happy",
+            "I am grateful"
+            // Add more affirmations as needed
+        ];
+
+        let currentAffirmation = 0;
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            if (currentAffirmation < affirmations.length) {
+                document.getElementById('affirmation').innerText = affirmations[currentAffirmation];
+                // Here, you'd start the audio recording process.
+                // After recording, send the audio to the backend for recognition.
+                // For now, just simulate moving to the next affirmation.
+                
+                // Simulate a timeout for demonstration (replace with actual recording logic)
+                setTimeout(() => {
+                    currentAffirmation++;
+                    if (currentAffirmation < affirmations.length) {
+                        document.getElementById('affirmation').innerText = "Please say: '" + affirmations[currentAffirmation] + "'";
+                    } else {
+                        document.getElementById('affirmation').innerText = "Thank you for participating!";
+                    }
+                }, 3000); // 3 seconds for demo
+            }
+        });
+    </script>
+</body>
+</html>

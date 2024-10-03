@@ -1,0 +1,29 @@
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+# Define the list of affirmations
+affirmations = [
+    "I am confident",
+    "I am worthy",
+    "I am loved",
+    "I am happy",
+    "I am grateful",
+    "I am enough",
+    "I deserve to be happy",
+    "I am enough because I am me",
+    "I love myself for who I am",
+    "My feelings matter",
+    "I am worthy of respect",
+    "I love my body just the way it is",
+    "I am ready for what comes next.",
+    "No one can make me feel inferior without my consent",
+    "I deserve happiness and fulfillment"
+]
+
+@app.route('/')
+def index():
+    return render_template('index.html', affirmations=affirmations)
+
+if __name__ == '__main__':
+    app.run(debug=True)
